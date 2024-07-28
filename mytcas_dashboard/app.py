@@ -158,7 +158,6 @@ filter = html.Div(
     ]
 )
 
-# Define the output section with cards and charts
 output = html.Div(
     [
         dbc.Row(
@@ -166,76 +165,108 @@ output = html.Div(
                 dbc.Col(
                     html.Div(
                         [
-                            dbc.Card(
-                                dbc.CardBody(
+                            dbc.Row(
+                                html.Div(
                                     [
-                                        html.H4(
-                                            "Total Students", className="card-title"
+                                        dbc.Card(
+                                            dbc.CardBody(
+                                                [
+                                                    html.H4(
+                                                        "Total Students",
+                                                        className="card-title",
+                                                    ),
+                                                    html.P(
+                                                        id="total-students-value",
+                                                        className="card-text",
+                                                        style={"fontSize": "24px"},
+                                                    ),
+                                                ]
+                                            ),
+                                            style={
+                                                "flex": "1",
+                                                "margin-bottom": "10px",
+                                                "width": "100%",
+                                            },
                                         ),
-                                        html.P(
-                                            id="total-students-value",
-                                            className="card-text",
-                                            style={"fontSize": "24px"},
+                                        dbc.Card(
+                                            dbc.CardBody(
+                                                [
+                                                    html.H4(
+                                                        "Male Students",
+                                                        className="card-title",
+                                                    ),
+                                                    html.P(
+                                                        id="male-students-value",
+                                                        className="card-text",
+                                                        style={"fontSize": "24px"},
+                                                    ),
+                                                ]
+                                            ),
+                                            style={
+                                                "flex": "1",
+                                                "margin-bottom": "10px",
+                                                "width": "100%",
+                                            },
                                         ),
-                                    ]
+                                        dbc.Card(
+                                            dbc.CardBody(
+                                                [
+                                                    html.H4(
+                                                        "Female Students",
+                                                        className="card-title",
+                                                    ),
+                                                    html.P(
+                                                        id="female-students-value",
+                                                        className="card-text",
+                                                        style={"fontSize": "24px"},
+                                                    ),
+                                                ]
+                                            ),
+                                            style={
+                                                "flex": "1",
+                                                "margin-bottom": "10px",
+                                                "width": "100%",
+                                            },
+                                        ),
+                                    ],
+                                    style={
+                                        "display": "flex",
+                                        "flexDirection": "row",
+                                        "gap": "10px",
+                                        "justifyContent": "center",  # Centering cards horizontally
+                                    },
                                 ),
                                 style={
-                                    "margin-bottom": "10px"
-                                },  # Spacing between cards
+                                    "padding": "0 20px",
+                                    "justifyContent": "center",  # Centering the row
+                                },
                             ),
-                            dbc.Card(
-                                dbc.CardBody(
-                                    [
-                                        html.H4(
-                                            "Male Students", className="card-title"
-                                        ),
-                                        html.P(
-                                            id="male-students-value",
-                                            className="card-text",
-                                            style={"fontSize": "24px"},
-                                        ),
-                                    ]
+                            dbc.Row(
+                                dbc.Col(
+                                    html.Div([dcc.Graph(id="graduates-bar-chart")]),
+                                    width=8,
+                                    style={
+                                        "padding": "0 20px",
+                                    },
                                 ),
-                                style={"margin-bottom": "10px"},
-                            ),
-                            dbc.Card(
-                                dbc.CardBody(
-                                    [
-                                        html.H4(
-                                            "Female Students", className="card-title"
-                                        ),
-                                        html.P(
-                                            id="female-students-value",
-                                            className="card-text",
-                                            style={"fontSize": "24px"},
-                                        ),
-                                    ]
-                                )
+                                style={
+                                    "justifyContent": "center",  # Centering the graph
+                                    "display": "flex",
+                                },
                             ),
                         ],
                         style={
-                            "display": "flex",
-                            "flexDirection": "column",
-                            "gap": "10px",
-                        },  # Arrange cards vertically
+                            "textAlign": "center",  # Center text if needed
+                        },
                     ),
-                    width=4,  # Width of the first column
-                    style={
-                        "padding": "0 20px"
-                    },  # Add padding to prevent content from being too close to the edges
-                ),
-                dbc.Col(
-                    html.Div([dcc.Graph(id="graduates-bar-chart")]),
-                    width=8,  # Width of the second column
-                    style={
-                        "padding": "0 20px"
-                    },  # Add padding to prevent content from being too close to the edges
+                    width=12,  # Full width column for centering
                 ),
             ],
-            style={"padding": "20px 0"},  # Add padding to the row
+            style={"padding": "20px 0", "margin": "0 auto"},
         )
     ]
 )
+
 
 # Define the additional output section with more charts and a data table
 additional_output = html.Div(
@@ -276,7 +307,11 @@ additional_output = html.Div(
                     },  # Add padding to prevent content from being too close to the edges
                 ),
             ],
-            style={"padding": "20px 0", "color": "black"},  # Add padding to the row
+            style={
+                "padding": "20px 0",
+                "color": "black",
+                "margin": "0 auto",
+            },  # Add padding to the row
         )
     ]
 )
