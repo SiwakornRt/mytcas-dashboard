@@ -6,7 +6,7 @@ authors = ["Chakapat Suwannapong <jakkapat.j7@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 dash = "^2.17.1"
 dash-bootstrap-components = "^1.6.0"
 pandas = "^2.2.2"
