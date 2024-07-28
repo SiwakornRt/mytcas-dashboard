@@ -250,7 +250,6 @@ output = html.Div(
                                     },
                                 ),
                                 style={
-                                    "justifyContent": "center",  # Centering the graph
                                     "display": "flex",
                                 },
                             ),
