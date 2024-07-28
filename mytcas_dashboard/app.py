@@ -90,7 +90,7 @@ filter = html.Div(
                     html.Div(
                         [
                             html.H6(
-                                "Province", style={"margin-bottom": "10px"}
+                                "Province", style={"marginBottom": "10px"}
                             ),  # Header for the Province dropdown
                             dcc.Dropdown(
                                 id="province-dropdown",
@@ -112,7 +112,7 @@ filter = html.Div(
                     html.Div(
                         [
                             html.H6(
-                                "Gender", style={"margin-bottom": "10px"}
+                                "Gender", style={"marginBottom": "10px"}
                             ),  # Header for the Gender dropdown
                             dcc.Dropdown(
                                 id="gender-dropdown",
@@ -133,7 +133,7 @@ filter = html.Div(
                     html.Div(
                         [
                             html.H6(
-                                "Sort By", style={"margin-bottom": "10px"}
+                                "Sort By", style={"marginBottom": "10px"}
                             ),  # Header for the Sort dropdown
                             dcc.Dropdown(
                                 id="sort-dropdown",
@@ -187,7 +187,7 @@ output = html.Div(
                                             ),
                                             style={
                                                 "flex": "1",
-                                                "margin-bottom": "10px",
+                                                "marginBottom": "10px",
                                                 "width": "100%",
                                             },
                                         ),
@@ -207,7 +207,7 @@ output = html.Div(
                                             ),
                                             style={
                                                 "flex": "1",
-                                                "margin-bottom": "10px",
+                                                "marginBottom": "10px",
                                                 "width": "100%",
                                             },
                                         ),
@@ -227,7 +227,7 @@ output = html.Div(
                                             ),
                                             style={
                                                 "flex": "1",
-                                                "margin-bottom": "10px",
+                                                "marginBottom": "10px",
                                                 "width": "100%",
                                             },
                                         ),
@@ -240,26 +240,25 @@ output = html.Div(
                                     },
                                 ),
                                 style={
-                                    "padding": "0 20px",
+                                    "padding": "0 10px",
                                     "justifyContent": "center",  # Centering the row
                                 },
                             ),
                             dbc.Col(
                                 [
                                     dbc.Row(
-                                        html.Div([dcc.Graph(id='map-graph')]),
+                                        html.Div([dcc.Graph(id="map-graph")]),
                                         style={
-                                            "padding": "0 20px",
+                                            "paddingLeft": "0 20px",
                                             "width": "100%",
                                             "flex": "1",
                                             "margin": "0 auto",
-                                            
                                         },
                                     ),
                                     dbc.Row(
                                         html.Div([dcc.Graph(id="graduates-bar-chart")]),
                                         style={
-                                            "padding": "0 20px",
+                                            "paddingRight": "0 20px",
                                             "width": "100%",
                                             "flex": "1",
                                             "margin": "0 auto",
@@ -267,6 +266,7 @@ output = html.Div(
                                     ),
                                 ],
                                 style={
+                                    "gap": "2",
                                     "display": "flex",
                                     "width": "100%",
                                     "margin": "0 auto",
@@ -295,14 +295,14 @@ additional_output = html.Div(
                     html.Div([dcc.Graph(id="gender-pie-chart")]),
                     width=4,  # Width of the first column
                     style={
-                        "padding": "0 20px"
+                        "padding": "0 10px"
                     },  # Add padding to prevent content from being too close to the edges
                 ),
                 dbc.Col(
                     html.Div([dcc.Graph(id="province-line-chart")]),
                     width=4,  # Width of the second column
                     style={
-                        "padding": "0 20px"
+                        "padding": "0 10px"
                     },  # Add padding to prevent content from being too close to the edges
                 ),
                 dbc.Col(
@@ -321,7 +321,7 @@ additional_output = html.Div(
                     ),
                     width=4,  # Width of the third column
                     style={
-                        "padding": "0 20px"
+                        "padding": "0 10px"
                     },  # Add padding to prevent content from being too close to the edges
                 ),
             ],
@@ -440,11 +440,17 @@ def update_visualizations(selected_provinces, selected_gender, sort_order):
         lon = df[df['schools_province'] == last_clicked_province]['lon'].values[0]
         zoom = 15
 
-    map_fig = px.scatter_mapbox(df, lat='lat', lon='lon',
-                            hover_name='schools_province', hover_data=['totalmale', 'totalfemale'],
-                            zoom=zoom, height=500)
+    map_fig = px.scatter_mapbox(
+        df,
+        lat="lat",
+        lon="lon",
+        hover_name="schools_province",
+        hover_data=["totalmale", "totalfemale"],
+        zoom=zoom,
+        height=450,
+    )
     map_fig.update_layout(mapbox=dict(center=dict(lat=lat, lon=lon)))
-    
+
     map_fig.update_traces(marker=dict(size=10, color='rgba(0, 0, 255, 0.5)', opacity=0.7), selector=dict(mode='markers'))
     for province in selected_provinces:
         map_fig.add_trace(go.Scattermapbox(
@@ -471,8 +477,6 @@ def update_visualizations(selected_provinces, selected_gender, sort_order):
         line_fig,
         table_data,
     )
-
-
 
 
 # Run the app
