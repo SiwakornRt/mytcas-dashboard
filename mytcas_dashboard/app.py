@@ -4,6 +4,8 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 import json
+import plotly.graph_objects as go
+from data.province import province_coords
 
 # Load data from JSON file
 with open("data/data.json", "r", encoding="utf-8") as f:
@@ -11,7 +13,8 @@ with open("data/data.json", "r", encoding="utf-8") as f:
 
 # Create DataFrame from JSON data
 df = pd.DataFrame(data)
-
+df['lat'] = df['schools_province'].map(lambda x: province_coords[x]['lat'] if x in province_coords else None)
+df['lon'] = df['schools_province'].map(lambda x: province_coords[x]['lon'] if x in province_coords else None)
 # Convert numerical data from string to integer
 df["totalmale"] = df["totalmale"].astype(int)
 df["totalfemale"] = df["totalfemale"].astype(int)
@@ -241,16 +244,32 @@ output = html.Div(
                                     "justifyContent": "center",  # Centering the row
                                 },
                             ),
-                            dbc.Row(
-                                dbc.Col(
-                                    html.Div([dcc.Graph(id="graduates-bar-chart")]),
-                                    width=8,
-                                    style={
-                                        "padding": "0 20px",
-                                    },
-                                ),
+                            dbc.Col(
+                                [
+                                    dbc.Row(
+                                        html.Div([dcc.Graph(id='map-graph')]),
+                                        style={
+                                            "padding": "0 20px",
+                                            "width": "100%",
+                                            "flex": "1",
+                                            "margin": "0 auto",
+                                            
+                                        },
+                                    ),
+                                    dbc.Row(
+                                        html.Div([dcc.Graph(id="graduates-bar-chart")]),
+                                        style={
+                                            "padding": "0 20px",
+                                            "width": "100%",
+                                            "flex": "1",
+                                            "margin": "0 auto",
+                                        },
+                                    ),
+                                ],
                                 style={
                                     "display": "flex",
+                                    "width": "100%",
+                                    "margin": "0 auto",
                                 },
                             ),
                         ],
@@ -331,6 +350,7 @@ app.layout = html.Div(
 @callback(
     [
         Output("graduates-bar-chart", "figure"),
+        Output("map-graph", "figure"),
         Output("total-students-value", "children"),
         Output("male-students-value", "children"),
         Output("female-students-value", "children"),
@@ -412,8 +432,38 @@ def update_visualizations(selected_provinces, selected_gender, sort_order):
     # Create Data Table
     table_data = filtered_df.to_dict("records")
 
+    if not selected_provinces:
+        lat, lon, zoom = df['lat'].mean(), df['lon'].mean(), 5
+    else:
+        last_clicked_province  = selected_provinces[-1]
+        lat = df[df['schools_province'] == last_clicked_province]['lat'].values[0]
+        lon = df[df['schools_province'] == last_clicked_province]['lon'].values[0]
+        zoom = 15
+
+    map_fig = px.scatter_mapbox(df, lat='lat', lon='lon',
+                            hover_name='schools_province', hover_data=['totalmale', 'totalfemale'],
+                            zoom=zoom, height=500)
+    map_fig.update_layout(mapbox=dict(center=dict(lat=lat, lon=lon)))
+    
+    map_fig.update_traces(marker=dict(size=10, color='rgba(0, 0, 255, 0.5)', opacity=0.7), selector=dict(mode='markers'))
+    for province in selected_provinces:
+        map_fig.add_trace(go.Scattermapbox(
+            lat=[df[df['schools_province'] == province]['lat'].values[0]],
+            lon=[df[df['schools_province'] == province]['lon'].values[0]],
+            mode='markers',
+            marker=go.scattermapbox.Marker(
+                size=20,
+                color='red',
+                opacity=0.9
+            ),
+            name=province
+        ))
+    map_fig.update_layout(mapbox_style="open-street-map")
+    map_fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+
     return (
         bar_fig,
+        map_fig,
         total_students,
         male_students,
         female_students,
@@ -421,6 +471,8 @@ def update_visualizations(selected_provinces, selected_gender, sort_order):
         line_fig,
         table_data,
     )
+
+
 
 
 # Run the app
