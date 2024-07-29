@@ -5,19 +5,18 @@ import plotly.express as px
 import pandas as pd
 import json
 import plotly.graph_objects as go
-from data.province import province_coords
+# from data.university import university_coords
 
-# Load data from JSON file
-with open("data/data.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-
-# Create DataFrame from JSON data
+# Load data from CSV file
+data = pd.read_csv("data/data_mark_01.csv")
+# Create DataFrame from CSV data
 df = pd.DataFrame(data)
-df['lat'] = df['schools_province'].map(lambda x: province_coords[x]['lat'] if x in province_coords else None)
-df['lon'] = df['schools_province'].map(lambda x: province_coords[x]['lon'] if x in province_coords else None)
-# Convert numerical data from string to integer
-df["totalmale"] = df["totalmale"].astype(int)
-df["totalfemale"] = df["totalfemale"].astype(int)
+# df["lat"] = df["uni"].map(
+#     lambda x: university_coords[x]["lat"] if x in university_coords else None
+# )
+# df["lon"] = df["uni"].map(
+#     lambda x: university_coords[x]["lon"] if x in university_coords else None
+# )
 
 # Initialize the Dash app with a dark theme
 app = Dash(external_stylesheets=[dbc.themes.DARKLY])
@@ -51,7 +50,7 @@ navbar = dbc.Navbar(
 header = html.Div(
     children=[
         html.H1(
-            children="Students Graduated Dashboard 2566",
+            children="Number Of Admitted Dashboard 2566",
             style={
                 "textAlign": "center",  # Center text horizontally
                 "margin": "20px auto",  # Add margin to center the element horizontally
@@ -59,7 +58,7 @@ header = html.Div(
             },
         ),
         html.P(
-            children="Number of students who graduated from Mathayom 6 in basic education",
+            children="Number of admitted from Mytcas website",
             style={
                 "textAlign": "center",  # Center text horizontally
                 "width": "100%",  # Make the paragraph take the full width
@@ -68,20 +67,22 @@ header = html.Div(
     ]
 )
 
-# Create options for the province dropdown, including "Select All"
-province_options = [{"label": "Select All", "value": "all"}] + [
-    {"label": province, "value": province}
-    for province in df["schools_province"].unique()
+# Create options for the university dropdown, including "Select All"
+university_options = [{"label": "Select All", "value": "all"}] + [
+    {"label": university, "value": university} for university in df["uni"].unique()
 ]
 
-# Create options for the gender dropdown, including "All"
-gender_options = [
-    {"label": "All", "value": "all"},
-    {"label": "Male", "value": "totalmale"},
-    {"label": "Female", "value": "totalfemale"},
+# Create options for the major dropdown, including "All"
+major_options = [{"label": "Select All", "value": "all"}] + [
+    {"label": major, "value": major} for major in df["major"].unique()
 ]
 
-# Define the filter section with dropdowns for province, gender, and sorting
+# Create options for the course dropdown, including "All"
+course_options = [{"label": "Select All", "value": "all"}] + [
+    {"label": course, "value": course} for course in df["course"].unique()
+]
+
+# Define the filter section with dropdowns for university, major, and sorting
 filter = html.Div(
     [
         dbc.Row(
@@ -90,11 +91,11 @@ filter = html.Div(
                     html.Div(
                         [
                             html.H6(
-                                "Province", style={"marginBottom": "10px"}
-                            ),  # Header for the Province dropdown
+                                "University", style={"marginBottom": "10px"}
+                            ),  # Header for the university dropdown
                             dcc.Dropdown(
-                                id="province-dropdown",
-                                options=province_options,
+                                id="university-dropdown",
+                                options=university_options,
                                 value=["all"],  # Default value is "Select All"
                                 multi=True,
                                 style={
@@ -112,11 +113,11 @@ filter = html.Div(
                     html.Div(
                         [
                             html.H6(
-                                "Gender", style={"marginBottom": "10px"}
-                            ),  # Header for the Gender dropdown
+                                "Major", style={"marginBottom": "10px"}
+                            ),  # Header for the major dropdown
                             dcc.Dropdown(
-                                id="gender-dropdown",
-                                options=gender_options,
+                                id="major-dropdown",
+                                options=major_options,
                                 value="all",  # Default value is "All"
                                 style={
                                     "width": "100%",
@@ -133,16 +134,12 @@ filter = html.Div(
                     html.Div(
                         [
                             html.H6(
-                                "Sort By", style={"marginBottom": "10px"}
-                            ),  # Header for the Sort dropdown
+                                "Course", style={"marginBottom": "10px"}
+                            ),  # Header for the course dropdown
                             dcc.Dropdown(
-                                id="sort-dropdown",
-                                options=[
-                                    {"label": "None", "value": "none"},
-                                    {"label": "Ascending", "value": "asc"},
-                                    {"label": "Descending", "value": "desc"},
-                                ],
-                                value="none",
+                                id="course-dropdown",
+                                options=course_options,
+                                value="all",  # Default value is "All"
                                 style={
                                     "width": "100%",
                                     "color": "black",
@@ -175,11 +172,11 @@ output = html.Div(
                                             dbc.CardBody(
                                                 [
                                                     html.H4(
-                                                        "Total Students",
+                                                        "Success Rate",
                                                         className="card-title",
                                                     ),
                                                     html.P(
-                                                        id="total-students-value",
+                                                        id="success-rate-value",
                                                         className="card-text",
                                                         style={"fontSize": "24px"},
                                                     ),
@@ -195,11 +192,11 @@ output = html.Div(
                                             dbc.CardBody(
                                                 [
                                                     html.H4(
-                                                        "Male Students",
+                                                        "Fee",
                                                         className="card-title",
                                                     ),
                                                     html.P(
-                                                        id="male-students-value",
+                                                        id="fee-value",
                                                         className="card-text",
                                                         style={"fontSize": "24px"},
                                                     ),
@@ -215,11 +212,11 @@ output = html.Div(
                                             dbc.CardBody(
                                                 [
                                                     html.H4(
-                                                        "Female Students",
+                                                        "Admitted",
                                                         className="card-title",
                                                     ),
                                                     html.P(
-                                                        id="female-students-value",
+                                                        id="admitted-value",
                                                         className="card-text",
                                                         style={"fontSize": "24px"},
                                                     ),
@@ -256,7 +253,9 @@ output = html.Div(
                                         },
                                     ),
                                     dbc.Row(
-                                        html.Div([dcc.Graph(id="graduates-bar-chart")]),
+                                        html.Div(
+                                            [dcc.Graph(id="university-bar-chart")]
+                                        ),
                                         style={
                                             "paddingRight": "0 20px",
                                             "width": "100%",
@@ -292,14 +291,14 @@ additional_output = html.Div(
         dbc.Row(
             [
                 dbc.Col(
-                    html.Div([dcc.Graph(id="gender-pie-chart")]),
+                    html.Div([dcc.Graph(id="major-pie-chart")]),
                     width=4,  # Width of the first column
                     style={
                         "padding": "0 10px"
                     },  # Add padding to prevent content from being too close to the edges
                 ),
                 dbc.Col(
-                    html.Div([dcc.Graph(id="province-line-chart")]),
+                    html.Div([dcc.Graph(id="university-line-chart")]),
                     width=4,  # Width of the second column
                     style={
                         "padding": "0 10px"
@@ -349,130 +348,158 @@ app.layout = html.Div(
 # Callback to update the visualizations based on filter and sort inputs
 @callback(
     [
-        Output("graduates-bar-chart", "figure"),
-        Output("map-graph", "figure"),
-        Output("total-students-value", "children"),
-        Output("male-students-value", "children"),
-        Output("female-students-value", "children"),
-        Output("gender-pie-chart", "figure"),
-        Output("province-line-chart", "figure"),
+        Output("university-bar-chart", "figure"),
+        # Output("map-graph", "figure"),
+        Output("success-rate-value", "children"),
+        Output("fee-value", "children"),
+        Output("admitted-value", "children"),
+        Output("major-pie-chart", "figure"),
+        Output("university-line-chart", "figure"),
         Output("data-table", "data"),
     ],
     [
-        Input("province-dropdown", "value"),
-        Input("gender-dropdown", "value"),
-        Input("sort-dropdown", "value"),
+        Input("university-dropdown", "value"),
+        Input("major-dropdown", "value"),
+        Input("course-dropdown", "value"),
     ],
 )
-def update_visualizations(selected_provinces, selected_gender, sort_order):
-    # Handle "Select All" option for provinces
-    if "all" in selected_provinces:
-        selected_provinces = df["schools_province"].unique().tolist()
+def update_visualizations(selected_university, selected_major, selected_course):
+    # Handle "Select All" option for universitys
+    if "all" in selected_university:
+        selected_university = df["uni"].unique().tolist()
 
-    # Filter data based on selected provinces
-    filtered_df = df[df["schools_province"].isin(selected_provinces)]
+    # Filter data based on selected universitys
+    filtered_df = df[df["uni"].isin(selected_university)]
 
-    # Handle "All" option for gender
-    if selected_gender == "all":
-        # Compute total counts for both genders
-        filtered_df["total"] = filtered_df[["totalmale", "totalfemale"]].sum(axis=1)
-        total_students = filtered_df["total"].sum()
-        male_students = filtered_df["totalmale"].sum()
-        female_students = filtered_df["totalfemale"].sum()
-        y_values = "total"
+    # Handle "All" option for major
+    if selected_major == "all":
+        # Compute total counts for both majors
+        average_success_rate = filtered_df["success_rate"].sum() / len(
+            filtered_df["success_rate"]
+        )
+        average_fee = filtered_df["fee"].sum() / len(filtered_df["fee"])
+        filtered_df["total_admitted"] = filtered_df[
+            ["round1", "round2", "round3", "round4"]
+        ].sum(axis=1)
+        total_admitted = filtered_df["total_admitted"].sum()
+        y_values = "major"
     else:
-        total_students = filtered_df[selected_gender].sum()
-        male_students = filtered_df["totalmale"].sum()
-        female_students = filtered_df["totalfemale"].sum()
-        y_values = selected_gender
+        filtered_df = df[df["major"].isin([selected_major])]
+        average_success_rate = filtered_df["success_rate"].sum() / len(
+            filtered_df["success_rate"]
+        )
+        average_fee = filtered_df["fee"].sum() / len(filtered_df["fee"])
+        filtered_df["total_admitted"] = filtered_df[
+            ["round1", "round2", "round3", "round4"]
+        ].sum(axis=1)
+        total_admitted = filtered_df["total_admitted"].sum()
+        y_values = selected_major
 
-    # Apply sorting if needed
-    if sort_order == "none":
-        sorted_df = filtered_df
-    elif sort_order == "desc":
-        sorted_df = filtered_df.sort_values(by=y_values, ascending=False)
-    else:  # sort_order == 'asc'
-        sorted_df = filtered_df.sort_values(by=y_values, ascending=True)
+    if selected_course == "all":
+        # Compute total counts for both majors
+        average_success_rate = filtered_df["success_rate"].sum() / len(
+            filtered_df["success_rate"]
+        )
+        average_fee = filtered_df["fee"].sum() / len(filtered_df["fee"])
+        filtered_df["total_admitted"] = filtered_df[
+            ["round1", "round2", "round3", "round4"]
+        ].sum(axis=1)
+        total_admitted = filtered_df["total_admitted"].sum()
+        y_values = "course"
+    else:
+        filtered_df = df[df["course"].isin([selected_course])]
+        average_success_rate = filtered_df["success_rate"].sum() / len(
+            filtered_df["success_rate"]
+        )
+        average_fee = filtered_df["fee"].sum() / len(filtered_df["fee"])
+        filtered_df["total_admitted"] = filtered_df[
+            ["round1", "round2", "round3", "round4"]
+        ].sum(axis=1)
+        total_admitted = filtered_df["total_admitted"].sum()
+        y_values = selected_course
+
+    sorted_df = filtered_df
 
     # Create Bar Chart
     bar_fig = px.bar(
         sorted_df,
-        x="schools_province",
-        y=["totalmale", "totalfemale"] if selected_gender == "all" else y_values,
-        title="Number of Graduates by Province and Gender in 2566",
+        x="uni",
+        y=["total_admitted"] if selected_major == "all" else y_values,
+        title="Number of Admiited in 2566",
         labels={
-            "schools_province": "Province",
-            "value": "Number of Students",
-            "variable": "Gender",
+            "uni": "University",
+            "value": "Number of Admiited",
         },
-        barmode="group",
+        barmode="relative",
     )
 
     # Create Pie Chart
-    gender_counts = filtered_df[["totalmale", "totalfemale"]].sum()
+    success_data = {
+        "label": ["Success", "Fail"],
+        "value": [average_success_rate, 100 - average_success_rate],
+    }
+    success_rate = pd.DataFrame(success_data)
     pie_fig = px.pie(
-        names=["Male", "Female"],
-        values=gender_counts,
-        title="Gender Distribution of Graduates in 2566",
+        success_rate,
+        names="label",
+        values="value",
+        title="Success Rate Distribution of Graduates in 2566",
     )
 
     # Create Line Chart
     line_fig = px.line(
         filtered_df,
-        x="schools_province",
-        y=["totalmale", "totalfemale"],
-        title="Trend of Graduates by Province in 2566",
+        x="uni",
+        y=["total_admitted"],
+        title="Trend of Admiited in 2566",
         labels={
-            "schools_province": "Province",
-            "value": "Number of Students",
-            "variable": "Gender",
+            "uni": "University",
+            "value": "Number of Admiited",
         },
     )
 
     # Create Data Table
     table_data = filtered_df.to_dict("records")
 
-    if not selected_provinces:
-        lat, lon, zoom = df['lat'].mean(), df['lon'].mean(), 5
-    else:
-        last_clicked_province  = selected_provinces[-1]
-        lat = df[df['schools_province'] == last_clicked_province]['lat'].values[0]
-        lon = df[df['schools_province'] == last_clicked_province]['lon'].values[0]
-        zoom = 15
+    # if not selected_university:
+    #     lat, lon, zoom = df['lat'].mean(), df['lon'].mean(), 5
+    # else:
+    #     last_clicked_university = selected_university[-1]
+    #     lat = df[df["uni"] == last_clicked_university]["lat"].values[0]
+    #     lon = df[df["uni"] == last_clicked_university]["lon"].values[0]
+    #     zoom = 15
 
-    map_fig = px.scatter_mapbox(
-        df,
-        lat="lat",
-        lon="lon",
-        hover_name="schools_province",
-        hover_data=["totalmale", "totalfemale"],
-        zoom=zoom,
-        height=450,
-    )
-    map_fig.update_layout(mapbox=dict(center=dict(lat=lat, lon=lon)))
+    # map_fig = px.scatter_mapbox(
+    #     df,
+    #     lat="lat",
+    #     lon="lon",
+    #     hover_name="uni",
+    #     hover_data=["totalmale", "totalfemale"],
+    #     zoom=zoom,
+    #     height=450,
+    # )
+    # map_fig.update_layout(mapbox=dict(center=dict(lat=lat, lon=lon)))
 
-    map_fig.update_traces(marker=dict(size=10, color='rgba(0, 0, 255, 0.5)', opacity=0.7), selector=dict(mode='markers'))
-    for province in selected_provinces:
-        map_fig.add_trace(go.Scattermapbox(
-            lat=[df[df['schools_province'] == province]['lat'].values[0]],
-            lon=[df[df['schools_province'] == province]['lon'].values[0]],
-            mode='markers',
-            marker=go.scattermapbox.Marker(
-                size=20,
-                color='red',
-                opacity=0.9
-            ),
-            name=province
-        ))
-    map_fig.update_layout(mapbox_style="open-street-map")
-    map_fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    # map_fig.update_traces(marker=dict(size=10, color='rgba(0, 0, 255, 0.5)', opacity=0.7), selector=dict(mode='markers'))
+    # for university in selected_university:
+    #     map_fig.add_trace(
+    #         go.Scattermapbox(
+    #             lat=[df[df["uni"] == university]["lat"].values[0]],
+    #             lon=[df[df["uni"] == university]["lon"].values[0]],
+    #             mode="markers",
+    #             marker=go.scattermapbox.Marker(size=20, color="red", opacity=0.9),
+    #             name=university,
+    #         )
+    #     )
+    # map_fig.update_layout(mapbox_style="open-street-map")
+    # map_fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
     return (
         bar_fig,
-        map_fig,
-        total_students,
-        male_students,
-        female_students,
+        # map_fig,
+        average_success_rate,
+        average_fee,
+        total_admitted,
         pie_fig,
         line_fig,
         table_data,
