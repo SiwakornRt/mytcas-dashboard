@@ -154,7 +154,42 @@ filter = html.Div(
             ],
             align="center",
             style={"margin": "0"},
-        )
+        ),
+
+        # Radio button
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.H6(
+                                "Marker Mode", style={"marginBottom": "10px"}
+                            ),  # Header for the radio buttons
+                            dcc.RadioItems(
+                                id="marker-mode",
+                                options=[
+                                    {"label": "Admitted", "value": "admitted"},
+                                    {"label": "Fee", "value": "fee"},
+                                    {"label": "Success Rate", "value": "success_rate"},
+                                ],
+                                value="admitted",  # Default value
+                                inline=True,
+                                style={
+                                    "color": "black",
+                                    "backgroundColor": "white",
+                                    "padding": "5px",
+                                    "borderRadius": "5px",
+                                },
+                            ),
+                        ]
+                    ),
+                    width=12,
+                    style={"padding": "0 10px"},
+                ),
+            ],
+            align="center",
+            style={"margin": "10px 0"},
+        ),
     ]
 )
 
