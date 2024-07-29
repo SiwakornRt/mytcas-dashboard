@@ -349,7 +349,7 @@ app.layout = html.Div(
 @callback(
     [
         Output("university-bar-chart", "figure"),
-        # Output("map-graph", "figure"),
+        Output("map-graph", "figure"),
         Output("success-rate-value", "children"),
         Output("fee-value", "children"),
         Output("admitted-value", "children"),
@@ -461,42 +461,41 @@ def update_visualizations(selected_university, selected_major, selected_course):
     # Create Data Table
     table_data = filtered_df.to_dict("records")
 
-    # if not selected_university:
-    #     lat, lon, zoom = df['lat'].mean(), df['lon'].mean(), 5
-    # else:
-    #     last_clicked_university = selected_university[-1]
-    #     lat = df[df["uni"] == last_clicked_university]["lat"].values[0]
-    #     lon = df[df["uni"] == last_clicked_university]["lon"].values[0]
-    #     zoom = 15
+    if not selected_university:
+        lat, lon, zoom = df['lat'].mean(), df['lon'].mean(), 5
+    else:
+        last_clicked_university = selected_university[-1]
+        lat = df[df["uni"] == last_clicked_university]["lat"].values[0]
+        lon = df[df["uni"] == last_clicked_university]["lon"].values[0]
+        zoom = 15
 
-    # map_fig = px.scatter_mapbox(
-    #     df,
-    #     lat="lat",
-    #     lon="lon",
-    #     hover_name="uni",
-    #     hover_data=["totalmale", "totalfemale"],
-    #     zoom=zoom,
-    #     height=450,
-    # )
-    # map_fig.update_layout(mapbox=dict(center=dict(lat=lat, lon=lon)))
+    map_fig = px.scatter_mapbox(
+        df,
+        lat="lat",
+        lon="lon",
+        hover_name="uni",
+        zoom=zoom,
+        height=450,
+    )
+    map_fig.update_layout(mapbox=dict(center=dict(lat=lat, lon=lon)))
 
-    # map_fig.update_traces(marker=dict(size=10, color='rgba(0, 0, 255, 0.5)', opacity=0.7), selector=dict(mode='markers'))
-    # for university in selected_university:
-    #     map_fig.add_trace(
-    #         go.Scattermapbox(
-    #             lat=[df[df["uni"] == university]["lat"].values[0]],
-    #             lon=[df[df["uni"] == university]["lon"].values[0]],
-    #             mode="markers",
-    #             marker=go.scattermapbox.Marker(size=20, color="red", opacity=0.9),
-    #             name=university,
-    #         )
-    #     )
-    # map_fig.update_layout(mapbox_style="open-street-map")
-    # map_fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    map_fig.update_traces(marker=dict(size=10, color='rgba(0, 0, 255, 0.5)', opacity=0.7), selector=dict(mode='markers'))
+    for university in selected_university:
+        map_fig.add_trace(
+            go.Scattermapbox(
+                lat=[df[df["uni"] == university]["lat"].values[0]],
+                lon=[df[df["uni"] == university]["lon"].values[0]],
+                mode="markers",
+                marker=go.scattermapbox.Marker(size=20, color="red", opacity=0.9),
+                name=university,
+            )
+        )
+    map_fig.update_layout(mapbox_style="open-street-map")
+    map_fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
     return (
         bar_fig,
-        # map_fig,
+        map_fig,
         average_success_rate,
         average_fee,
         total_admitted,
